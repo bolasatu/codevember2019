@@ -13,6 +13,9 @@ let trackList = {
   },
 }
 
+/**
+ * Audio class to manage a playlist and an audio element
+ */
 export default class Audio {
   constructor() {
     this.audioNode = document.querySelector("#audio");
@@ -25,6 +28,10 @@ export default class Audio {
     };
     this.tracksetEvent = new Event("trackset");
   }
+
+  /**
+   * Start the audio playback
+   */
   start() {
     if (!this.started) {
       this.setTrack(0);
@@ -32,6 +39,11 @@ export default class Audio {
       console.log("audio started");
     }
   }
+
+  /**
+   * Set the current track
+   * @param {Number} id - the id of the track to play
+   */
   setTrack(id) {
     if (id < 0) { 
       id = this.tracks.length - 1;
@@ -46,12 +58,25 @@ export default class Audio {
 
     console.log("track setted " + this.currentTrackIndex);
   }
+
+  /**
+   * Get the current track
+   * @returns {Object}
+   */
   getCurrentTrack() {
     return this.tracks[this.currentTrackIndex];
   }
+
+  /**
+   * Go to the next track in the playlist
+   */
   nextTrack() {
     this.setTrack(this.currentTrackIndex + 1);
   }
+
+  /**
+   * Go to the previous track in the playlist
+   */
   previousTrack() {
     this.setTrack(this.currentTrackIndex - 1);
   }
