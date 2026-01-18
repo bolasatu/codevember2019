@@ -1,4 +1,12 @@
+/**
+ * AudioAnalyser uses the Web Audio API to analyse an audio source
+ */
 export default class AudioAnalyser{
+    /**
+     * @param {Object} props
+     * @param {Audio} props.audio - an Audio instance
+     * @param {Number} props.fftSize - the fftSize, must be a power of 2
+     */
     constructor({audio, fftSize}){
         this.audio = audio;
         this.context = new AudioContext();
@@ -37,6 +45,10 @@ export default class AudioAnalyser{
         this.beat = 0;
     }
 
+    /**
+     * Should be called at each frame
+     * @param {Number} deltaTime - time elapsed since last frame
+     */
     refreshData(deltaTime){
         this.analyser.getByteFrequencyData(this.dataArray);
         if(this.beat > 0){
@@ -46,6 +58,9 @@ export default class AudioAnalyser{
         }
     }
 
+    /**
+     * Display the audio data on a canvas
+     */
     debug(){
         this.debugger.canvas.width = window.innerWidth;
         this.debugger.canvas.height = window.innerHeight;
@@ -59,12 +74,24 @@ export default class AudioAnalyser{
         }
     }
     
+    /**
+     * Extract a portion of the frequency data
+     * @param {Number} min - percentage of the low frequencies to ignore
+     * @param {Number} max - percentage of the high frequencies to ignore
+     * @returns {Uint8Array}
+     */
     extractData(min,max){
         let _min = Math.floor(min/100 * this.dataArray.length);
         let _max = Math.ceil(max/100 * this.dataArray.length);
         return this.dataArray.slice(_min, _max);
     }
       
+    /**
+     * Get the average value of a frequency data slice
+     * @param {Number} min - percentage of the low frequencies to ignore
+     * @param {Number} max - percentage of the high frequencies to ignore
+     * @returns {Number} - a value between 0 and 1
+     */
     getMoy(min,max){
         let array = this.extractData(min,max);
         let moy = 0;
@@ -74,11 +101,23 @@ export default class AudioAnalyser{
         return (moy/array.length)/255;
     }
     
+    /**
+     * Get the max value of a frequency data slice
+     * @param {Number} min - percentage of the low frequencies to ignore
+     * @param {Number} max - percentage of the high frequencies to ignore
+     * @returns {Number} - a value between 0 and 1
+     */
     getMax(min,max){
         let array = this.extractData(min,max);
         return Math.max( ...array)/255;
     }
 
+    /**
+     * 
+     * @param {Number} min - percentage of the low frequencies to ignore
+     * @param {Number} max - percentage of the high frequencies to ignore
+     * @param {Number} q - the quartile to get, between 0 and 1
+     */
     getQuartile(min,max,q) {
         let array = this.extractData(min,max);
         array = Array_Sort_Numbers(array);
@@ -98,10 +137,22 @@ export default class AudioAnalyser{
         }
     }
 
+    /**
+     * Get a value representing the kick of the music
+     * @param {Number} min - percentage of the low frequencies to ignore
+     * @param {Number} max - percentage of the high frequencies to ignore
+     * @returns {Number}
+     */
     getKick(min, max) {
         return this.getQuartile(min,max,0.75) / 255 + this.getQuartile(min,max,0.25) / 255;
     }
 
+    /**
+     * Returns true if a beat is detected
+     * @param {Number} min - percentage of the low frequencies to ignore
+     * @param {Number} max - percentage of the high frequencies to ignore
+     * @returns {Boolean}
+     */
     getBeat(min,max){
         let val = this.getKick(min,max);
         if(this.beat == 0 && val > 1.0){
