@@ -22,25 +22,6 @@ export default class AudioAnalyser{
         this.audio.audioNode.addEventListener('trackset', ()=>{
             this.context.resume();
         });
-
-        /*
-            DEBUGGER
-        */
-        let debugCanvas = document.createElement("canvas");
-        debugCanvas.width = window.innerWidth;
-        debugCanvas.height = window.innerHeight;
-        debugCanvas.style = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 9999;
-            pointer-events: none;
-        `;
-        document.querySelector("body").append(debugCanvas);
-        this.debugger = {
-            canvas: debugCanvas,
-            ctx: debugCanvas.getContext("2d")
-        }
   
         this.beat = 0;
     }
@@ -58,21 +39,6 @@ export default class AudioAnalyser{
         }
     }
 
-    /**
-     * Display the audio data on a canvas
-     */
-    debug(){
-        this.debugger.canvas.width = window.innerWidth;
-        this.debugger.canvas.height = window.innerHeight;
-        this.debugger.ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
-        this.debugger.ctx.fillStyle = "#FF0000";
-
-        let width = window.innerWidth/this.dataArray.length;
-        for(let i = 0; i<this.dataArray.length; i++){
-            let height = this.dataArray[i]/255 * window.innerHeight * 0.2;
-            this.debugger.ctx.fillRect(width * i,window.innerHeight - height, width - 2, height);
-        }
-    }
     
     /**
      * Extract a portion of the frequency data

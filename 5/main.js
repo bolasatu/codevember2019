@@ -1,3 +1,6 @@
+/**
+ * Main script for experiment 5
+ */
   window.onload = function() {
     let mouse = {x:0, y: 0};
     let smoothedMouse = {x:0, y: 0};

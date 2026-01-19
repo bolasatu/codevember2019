@@ -1,3 +1,6 @@
+/**
+ * Main script for experiment 1
+ */
 window.onload = function() {
   
   let mouse = {x:0, y: 0}

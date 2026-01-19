@@ -1,11 +1,17 @@
 import Audio from "./Audio.js";
 import AudioAnalyser from "./AudioAnalyser.js";
+
+/**
+ * Main script
+ */
 window.onload = function() {
 
+    // Create an audio player and an analyser
     let audio = new Audio();
     let analyser = new AudioAnalyser({ audio: audio, fftSize: 1024 });
 
     
+    // When a new track is set, update the title
     audio.audioNode.addEventListener('trackset', ()=>{   
         document.querySelector(".content").classList.remove("active");
         setTimeout(() => {
@@ -17,14 +23,18 @@ window.onload = function() {
     window.addEventListener("keydown", e => {
       
     });
+
+    // set up the mouse cursor
     let cursor = document.querySelector(".cursor");
     let mouse = {x:0, y: 0};
     let smoothedMouse = {x:0, y: 0};
     window.onmousemove = function(e){
       mouse.x = e.clientX;
       mouse.y = e.clientY;
+      // use a custom cursor
       cursor.style = `top:${mouse.y}px; left:${mouse.x}px`;
       if(audio.started){
+        // change the cursor text based on the mouse position
         if(mouse.x < window.innerWidth/2){
           cursor.innerText = "<";
         }else{
@@ -33,6 +43,7 @@ window.onload = function() {
       }
     }
 
+    // On click, start the audio or change track
     window.addEventListener("click", () => {
       if(!audio.started){
         audio.start();
@@ -107,15 +118,19 @@ window.onload = function() {
       let delta = (Date.now() - last)/1000;
       last = Date.now();
 
+      // refresh the audio data
       analyser.refreshData(delta);
-      //analyser.debug();
 
+      // pass the audio data to the shader
       plane.uniforms.kick.value = analyser.getKick(0,75);
       plane.uniforms.volume.value = analyser.getMoy(0,75);
       analyser.getBeat(0,50)
       plane.uniforms.beat.value = analyser.beat;
 
+      // update the time uniform
       plane.uniforms.time.value+=delta * 0.001;
+
+      // smooth the mouse position and pass it to the shader
       smoothedMouse.x += (mouse.x - smoothedMouse.x) * 0.1;
       smoothedMouse.y += (mouse.y - smoothedMouse.y) * 0.1;
       let mouseCoord = plane.mouseToPlaneCoords(smoothedMouse.x, smoothedMouse.y);
